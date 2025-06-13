@@ -1,0 +1,70 @@
+<project name="MiniDreamWeaver" default="default" basedir=".">
+    <description>Builds, tests, and runs the MiniDreamWeaver project.</description>
+    <import file="nbproject/build-impl.xml"/>
+
+    <property name="src.dir" location="src"/>
+    <property name="build.dir" location="build"/>
+    <property name="dist.dir" location="dist"/>
+    <property name="lib.dir" location="lib"/>
+    <property name="test.src.dir" location="test"/>
+    <property name="test.build.dir" location="build/test"/>
+    <property name="test.reports.dir" location="build/test-reports"/>
+    <property name="main.class" value="minidreamweaver.Main"/>
+
+    <path id="compile.classpath">
+        <!-- Add other compile-time libraries here if needed -->
+    </path>
+
+    <path id="test.classpath">
+        <pathelement location="${lib.dir}/junit-4.13.2.jar"/>
+        <pathelement location="${lib.dir}/hamcrest-core-1.3.jar"/>
+        <pathelement location="${build.dir}"/> <!-- To find compiled application classes -->
+    </path>
+
+    <target name="init" description="Initialize build directories">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${test.build.dir}"/>
+        <mkdir dir="${test.reports.dir}"/>
+    </target>
+
+    <target name="compile" depends="init" description="Compile the source code">
+        <javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="compile.classpath" includeantruntime="false" debug="true"/>
+    </target>
+
+    <target name="jar" depends="compile" description="Create a JAR file">
+        <jar destfile="${dist.dir}/MiniDreamWeaver.jar" basedir="${build.dir}" manifest="manifest.mf">
+        </jar>
+    </target>
+
+    <target name="run" depends="jar" description="Run the application">
+        <java jar="${dist.dir}/MiniDreamWeaver.jar" fork="true"/>
+    </target>
+
+    <target name="compile-tests" depends="compile" description="Compile unit tests">
+        <javac srcdir="${test.src.dir}" destdir="${test.build.dir}" classpathref="test.classpath" includeantruntime="false" debug="true"/>
+    </target>
+
+    <target name="test" depends="compile-tests" description="Run JUnit tests">
+        <junit printsummary="yes" haltonfailure="no" fork="true">
+            <classpath>
+                <path refid="test.classpath"/>
+                <pathelement location="${test.build.dir}"/>
+            </classpath>
+            <formatter type="xml"/> <!-- For detailed reports -->
+            <formatter type="plain" usefile="false"/> <!-- For console output -->
+            <batchtest todir="${test.reports.dir}">
+                <fileset dir="${test.src.dir}">
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="clean" description="Clean up build artifacts">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
+
+    <target name="default" description="Default target" depends="jar"/>
+</project>
